@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "proxies": [
+    {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "name": "历史确认的本地入口（仅示例）",
+      "kind": "http",
+      "host": "127.0.0.1",
+      "port": 1082,
+      "udp": false
+    }
+  ],
+  "rules": [
+    {
+      "id": "22222222-2222-4222-8222-222222222222",
+      "selector": {
+        "processPath": "/Applications/Example Browser.app/Contents/MacOS/Browser",
+        "domain": { "kind": "suffix", "value": "claude.ai" }
+      },
+      "destination": { "kind": "proxy", "proxyID": "11111111-1111-4111-8111-111111111111" }
+    },
+    {
+      "id": "33333333-3333-4333-8333-333333333333",
+      "selector": { "domain": { "kind": "exact", "value": "api.anthropic.com" } },
+      "destination": { "kind": "proxy", "proxyID": "11111111-1111-4111-8111-111111111111" }
+    }
+  ],
+  "defaultDestination": { "kind": "direct" }
+}

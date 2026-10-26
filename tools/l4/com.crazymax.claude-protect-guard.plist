@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.crazymax.claude-protect-guard</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/usr/local/bin/claude-protect-guard</string>
+		<string>watch</string>
+		<string>--interval</string>
+		<string>0.5</string>
+		<string>--debounce</string>
+		<string>2</string>
+		<string>--cooldown</string>
+		<string>20</string>
+	</array>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>KeepAlive</key>
+	<true/>
+	<key>StandardOutPath</key>
+	<string>/var/log/claude-protect-guard.out.log</string>
+	<key>StandardErrorPath</key>
+	<string>/var/log/claude-protect-guard.err.log</string>
+</dict>
+</plist>

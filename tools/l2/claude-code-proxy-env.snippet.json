@@ -1,0 +1,8 @@
+{
+  "_comment": "Merge into ~/.claude/settings.json under the top-level \"env\" object. Default 你的代理客户端 HTTP entry 127.0.0.1:1082. Does not start Claude or mutate PF.",
+  "env": {
+    "HTTP_PROXY": "http://127.0.0.1:1082",
+    "HTTPS_PROXY": "http://127.0.0.1:1082",
+    "NO_PROXY": "localhost,127.0.0.1,::1"
+  }
+}

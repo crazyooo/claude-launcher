@@ -1,0 +1,13 @@
+.build/
+dist/
+.DS_Store
+*.xcuserstate
+__pycache__/
+*.pyc
+diagnostics/
+.handoffs/
+web-notes/
+_handoff.md
+_review.md
+.env
+.env.*
