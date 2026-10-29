@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="380" viewBox="0 0 1200 380" role="img" aria-labelledby="title desc">
+  <title id="title">Claude 环境检测</title>
+  <desc id="desc">macOS 菜单栏工具：看清 Claude 是否走你的代理，并可选用防直连挡住 Anthropic 静默直连。</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#10281F"/>
+      <stop offset="100%" stop-color="#0A1A14"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#18382C"/>
+      <stop offset="100%" stop-color="#122820"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="380" rx="28" fill="url(#bg)"/>
+  <rect x="1.5" y="1.5" width="1197" height="377" rx="26.5" fill="none" stroke="#2B5343" stroke-width="1.5"/>
+  <path d="M740 48 H820 L840 28 L870 78 L900 42 L930 58 H1020" fill="none" stroke="#E8A070" stroke-opacity="0.18" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <g id="title-block" transform="translate(56 52)">
+    <rect x="0" y="0" width="132" height="28" rx="14" fill="#1C4032" stroke="#3A6B56" stroke-width="1"/>
+    <text x="16" y="19" fill="#B7D0C3" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">PUBLIC BETA</text>
+    <text x="0" y="84" fill="#F3EEE4" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, PingFang SC, sans-serif" font-size="48" font-weight="700">Claude 环境检测</text>
+    <text x="0" y="128" fill="#C9D8CF" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, PingFang SC, sans-serif" font-size="24">看清代理链路 · 可选挡住静默直连</text>
+    <text x="0" y="178" fill="#8FA898" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, PingFang SC, sans-serif" font-size="18">macOS 菜单栏 App：检查 Desktop / CLI 是否真走你的代理。</text>
+    <text x="0" y="206" fill="#8FA898" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, PingFang SC, sans-serif" font-size="18">不代启 Claude，不接管整机分流。其它 App 仍听你原来的设置。</text>
+    <g transform="translate(0 248)">
+      <rect x="0" y="0" width="118" height="34" rx="10" fill="#1C4032" stroke="#3A6B56" stroke-width="1"/>
+      <text x="18" y="22" fill="#F3EEE4" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14">MIT</text>
+      <rect x="128" y="0" width="148" height="34" rx="10" fill="#1C4032" stroke="#3A6B56" stroke-width="1"/>
+      <text x="146" y="22" fill="#F3EEE4" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14">macOS 13+</text>
+      <rect x="286" y="0" width="168" height="34" rx="10" fill="#1C4032" stroke="#3A6B56" stroke-width="1"/>
+      <text x="304" y="22" fill="#F3EEE4" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14">v0.16 · Swift</text>
+    </g>
+  </g>
+  <g id="project-proof" transform="translate(700 78)">
+    <rect x="0" y="0" width="440" height="230" rx="20" fill="url(#panel)" stroke="#2F5A47" stroke-width="1.5"/>
+    <rect x="18" y="18" width="404" height="36" rx="10" fill="#0C1F18"/>
+    <circle cx="38" cy="36" r="5" fill="#E8A070"/>
+    <text x="54" y="41" fill="#F3EEE4" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, PingFang SC, sans-serif" font-size="14" font-weight="600">环境检测</text>
+    <text x="300" y="41" fill="#8FA898" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">OK</text>
+    <circle cx="78" cy="118" r="28" fill="none" stroke="#F3EEE4" stroke-width="6"/>
+    <line x1="98" y1="138" x2="118" y2="158" stroke="#F3EEE4" stroke-width="7" stroke-linecap="round"/>
+    <path d="M58 118 H68 L74 104 L82 132 L90 112 H98" fill="none" stroke="#E8A070" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="148" y="108" fill="#F3EEE4" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, PingFang SC, sans-serif" font-size="20" font-weight="600">一键检测</text>
+    <text x="148" y="136" fill="#8FA898" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, PingFang SC, sans-serif" font-size="16">proxy · Desktop · CLI</text>
+    <rect x="18" y="178" width="192" height="34" rx="10" fill="#214937" stroke="#3A6B56" stroke-width="1"/>
+    <text x="36" y="200" fill="#B7D0C3" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14">detect · local</text>
+    <rect x="222" y="178" width="200" height="34" rx="10" fill="#3A2A22" stroke="#8B5A42" stroke-width="1"/>
+    <text x="240" y="200" fill="#E8A070" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14">protect · optional</text>
+  </g>
+</svg>
