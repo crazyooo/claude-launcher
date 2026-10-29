@@ -2,27 +2,28 @@ import SwiftUI
 import AppKit
 import LauncherCore
 
-/// First-screen product surface: background local detect → structured data → optional protect.
+/// First screen: proxy strip → hero verdict → one primary detect → collapsed detail.
 struct ProductHomePanel: View {
     @ObservedObject var model: EnvironmentModel
     @ObservedObject var websiteResults: WebsiteResultsSession
     @StateObject private var session = ProductDetectSession()
     @AppStorage("detector.proxyAlreadyOn") private var proxyAlreadyOn = false
+    @State private var showWebsite = false
+    @State private var showData = false
+    @State private var showPaths = false
+    @State private var showBrowser = false
     var openProtect: () -> Void
     var openDetails: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 22) {
-            header
-            proxyCard
-            actionRow
-            verdictCard
-            WebsiteResultsPanel(session: websiteResults)
-            dataCard
-            pathCard
-            browserCard
+        VStack(alignment: .leading, spacing: DetectorStyle.space * 2.5) {
+            identityHeader
+            proxyStrip
+            verdictHero
+            primaryActions
+            detailStack
             Text("本机与网站结果分别展示；网站结果不覆盖 Desktop / CLI 本机结论。")
-                .font(.system(size: 12))
+                .font(.system(size: 11))
                 .foregroundStyle(DetectorStyle.muted)
         }
         .onAppear {
@@ -30,54 +31,48 @@ struct ProductHomePanel: View {
             if !model.busy, !model.reports.isEmpty {
                 session.ingest(model: model, proxyAlreadyOn: proxyAlreadyOn)
             }
+            if session.verdict.data != nil { showData = true }
         }
         .onChange(of: proxyAlreadyOn) { _ in
             session.refreshProxyOnly(settings: model.settings, proxyAlreadyOn: proxyAlreadyOn)
         }
         .onChange(of: model.busy) { busy in
-            // Toolbar / auto-detect also feed the first screen when a round finishes.
             if !busy, !session.busy {
                 session.ingest(model: model, proxyAlreadyOn: proxyAlreadyOn)
+                if session.verdict.data != nil { showData = true }
             }
         }
     }
 
-    private var header: some View {
-        HStack(alignment: .top, spacing: 16) {
+    private var identityHeader: some View {
+        HStack(alignment: .center, spacing: 14) {
             Image(systemName: "waveform.path.ecg")
-                .font(.system(size: 26))
-                .foregroundStyle(DetectorStyle.green)
-                .frame(width: 58, height: 58)
-                .background(DetectorStyle.green.opacity(0.08), in: RoundedRectangle(cornerRadius: 16))
-            VStack(alignment: .leading, spacing: 8) {
-                Text("环境检测").font(.system(size: 30, weight: .semibold)).tracking(-0.5)
-                Text("一键检测在后台核对代理入口与本机 Claude 路径，把出口 IP 与逐站结果回填到本页。默认不弹浏览器。可选再进「防直连」。")
+                .font(.system(size: 22, weight: .semibold))
+                .foregroundStyle(DetectorStyle.pulse)
+                .frame(width: 52, height: 52)
+                .background(DetectorStyle.greenSoft, in: RoundedRectangle(cornerRadius: 14))
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("环境检测")
+                    .font(.system(size: 26, weight: .semibold))
+                    .tracking(-0.4)
+                Text("看清代理链路 · 可选挡住静默直连")
                     .font(.system(size: 13))
                     .foregroundStyle(DetectorStyle.muted)
             }
-            Spacer(minLength: 12)
+            Spacer(minLength: 8)
             if session.busy || model.busy {
-                ProgressView().controlSize(.small).padding(.top, 10)
-            } else {
-                verdictBadge.padding(.top, 10)
+                ProgressView().controlSize(.small)
             }
         }
     }
 
-    private var verdictBadge: some View {
-        Label(session.verdict.kind.rawValue, systemImage: session.verdict.kind.symbol)
-            .font(.system(size: 12, weight: .medium))
-            .foregroundStyle(verdictColor(session.verdict.kind))
-    }
-
-    private var proxyCard: some View {
+    private var proxyStrip: some View {
         VStack(alignment: .leading, spacing: 12) {
             Toggle(isOn: $proxyAlreadyOn) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("已开代理").font(.system(size: 15, weight: .semibold))
-                    Text(proxyAlreadyOn
-                         ? "声明：浏览器/Claude 走代理。将核对本地入口是否真的在听。"
-                         : "声明：当前按直连理解。若入口实际在听，结论会提示你改开关。")
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("已开代理").font(.system(size: 14, weight: .semibold))
+                    Text(proxyAlreadyOn ? "将核对本地入口是否在听" : "当前按直连理解；入口若在听会提示改开关")
                         .font(.system(size: 12))
                         .foregroundStyle(DetectorStyle.muted)
                 }
@@ -86,7 +81,7 @@ struct ProductHomePanel: View {
 
             HStack(spacing: 10) {
                 Circle()
-                    .fill(session.verdict.proxy?.listening == true ? DetectorStyle.green : DetectorStyle.amber)
+                    .fill(session.verdict.proxy?.listening == true ? DetectorStyle.green : DetectorStyle.pulse)
                     .frame(width: 8, height: 8)
                 Text(session.verdict.proxy.map { "入口 \($0.endpoint) · \($0.listening ? "可达" : "不可达")" }
                      ?? "入口尚未探测")
@@ -100,18 +95,50 @@ struct ProductHomePanel: View {
                 .disabled(session.busy || model.busy)
             }
             Text(model.settings.diagnosticProxy.isEmpty
-                 ? "未配置诊断代理；可在检测设置填写 http://127.0.0.1:1082"
+                 ? "未配置诊断代理 · 设置里可填 http://127.0.0.1:1082"
                  : model.settings.diagnosticProxy)
                 .font(.system(size: 11, design: .monospaced))
                 .foregroundStyle(DetectorStyle.muted)
                 .textSelection(.enabled)
         }
-        .padding(18)
-        .background(DetectorStyle.surface, in: RoundedRectangle(cornerRadius: 14))
-        .overlay(RoundedRectangle(cornerRadius: 14).stroke(DetectorStyle.border))
+        .detectorCard(.quiet)
     }
 
-    private var actionRow: some View {
+    private var verdictHero: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .firstTextBaseline) {
+                Text("检测结论")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(DetectorStyle.muted)
+                Spacer()
+                Label(session.verdict.kind.rawValue, systemImage: session.verdict.kind.symbol)
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(verdictColor(session.verdict.kind))
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(verdictColor(session.verdict.kind).opacity(0.12), in: Capsule())
+            }
+            Text(session.verdict.headline)
+                .font(.system(size: 24, weight: .semibold))
+                .foregroundStyle(verdictColor(session.verdict.kind))
+                .fixedSize(horizontal: false, vertical: true)
+            Text(session.verdict.detail)
+                .font(.system(size: 13))
+                .foregroundStyle(DetectorStyle.ink)
+                .fixedSize(horizontal: false, vertical: true)
+            Text("下一步：\(session.verdict.nextStep)")
+                .font(.system(size: 12))
+                .foregroundStyle(DetectorStyle.muted)
+            if model.manualRequired && session.verdict.kind != .degraded {
+                Label("已记录异常；处理完后再点「一键检测」。", systemImage: "exclamationmark.circle")
+                    .font(.system(size: 12))
+                    .foregroundStyle(DetectorStyle.pulse)
+            }
+        }
+        .detectorCard(.hero)
+    }
+
+    private var primaryActions: some View {
         HStack(spacing: 12) {
             Button {
                 session.run(model: model, proxyAlreadyOn: proxyAlreadyOn, openBrowser: false)
@@ -135,47 +162,59 @@ struct ProductHomePanel: View {
         }
     }
 
-    private var verdictCard: some View {
+    private var detailStack: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("检测结论").font(.system(size: 14, weight: .semibold))
-            Text(session.verdict.headline)
-                .font(.system(size: 20, weight: .semibold))
-                .foregroundStyle(verdictColor(session.verdict.kind))
-            Text(session.verdict.detail)
-                .font(.system(size: 13))
-                .foregroundStyle(DetectorStyle.ink)
-            Text("下一步：\(session.verdict.nextStep)")
-                .font(.system(size: 12))
-                .foregroundStyle(DetectorStyle.muted)
-            if model.manualRequired && session.verdict.kind != .degraded {
-                Label("已记录异常；处理完后再点「一键检测」。", systemImage: "exclamationmark.circle")
-                    .font(.callout)
-                    .foregroundStyle(DetectorStyle.amber)
+            disclosure("网站检测结果", isOn: $showWebsite, systemImage: "globe") {
+                WebsiteResultsPanel(session: websiteResults, embedded: true)
+            }
+            if session.verdict.data != nil {
+                disclosure("后台检测数据", isOn: $showData, systemImage: "tablecells") {
+                    dataBody
+                }
+            }
+            disclosure("本机路径", isOn: $showPaths, systemImage: "point.3.connected.trianglepath.dotted") {
+                pathBody
+            }
+            disclosure("外部浏览器对照", isOn: $showBrowser, systemImage: "safari") {
+                browserBody
             }
         }
-        .padding(18)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(DetectorStyle.surface, in: RoundedRectangle(cornerRadius: 14))
-        .overlay(RoundedRectangle(cornerRadius: 14).stroke(DetectorStyle.border))
+    }
+
+    private func disclosure<Content: View>(
+        _ title: String,
+        isOn: Binding<Bool>,
+        systemImage: String,
+        @ViewBuilder content: @escaping () -> Content
+    ) -> some View {
+        DisclosureGroup(isExpanded: isOn) {
+            content()
+                .padding(.top, 10)
+        } label: {
+            Label(title, systemImage: systemImage)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(DetectorStyle.ink)
+        }
+        .padding(14)
+        .background(DetectorStyle.surfaceQuiet, in: RoundedRectangle(cornerRadius: DetectorStyle.radiusCard))
+        .overlay(RoundedRectangle(cornerRadius: DetectorStyle.radiusCard).stroke(DetectorStyle.border))
     }
 
     @ViewBuilder
-    private var dataCard: some View {
+    private var dataBody: some View {
         if let data = session.verdict.data {
-            VStack(alignment: .leading, spacing: 14) {
+            VStack(alignment: .leading, spacing: 12) {
                 HStack {
-                    Text("后台检测数据").font(.system(size: 14, weight: .semibold))
+                    Text(data.summaryLine)
+                        .font(.system(size: 12, design: .monospaced))
+                        .textSelection(.enabled)
                     Spacer()
                     Text(Self.shortTime(data.collectedAt))
                         .font(.system(size: 11, design: .monospaced))
                         .foregroundStyle(DetectorStyle.muted)
                 }
-                Text(data.summaryLine)
-                    .font(.system(size: 13, design: .monospaced))
-                    .textSelection(.enabled)
-
                 if !data.hosts.isEmpty {
-                    VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 6) {
                         ForEach(data.hosts.prefix(8)) { sample in
                             HStack(alignment: .firstTextBaseline, spacing: 8) {
                                 Text(sample.path)
@@ -208,34 +247,28 @@ struct ProductHomePanel: View {
                                 .font(.caption)
                                 .foregroundStyle(DetectorStyle.muted)
                         }
-                        Text("逐站结果只反映当前线路对这些域名的网络可达性；「可访问」不证明账号、订阅或对话可用，失败行也不代表 Claude 服务故障。")
+                        Text("逐站结果只反映当前线路可达性，不证明账号或对话可用。")
                             .font(.system(size: 11))
                             .foregroundStyle(DetectorStyle.muted)
                     }
                 }
-
                 if !data.issues.isEmpty {
                     VStack(alignment: .leading, spacing: 6) {
                         Text("其它待处理项").font(.system(size: 12, weight: .semibold))
                         ForEach(data.issues.prefix(5)) { issue in
                             Text("· \(issue.target)：\(issue.title)（\(issue.code)）")
                                 .font(.system(size: 12))
-                                .foregroundStyle(DetectorStyle.amber)
+                                .foregroundStyle(DetectorStyle.pulse)
                         }
                     }
                 }
             }
-            .padding(18)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(DetectorStyle.surface, in: RoundedRectangle(cornerRadius: 14))
-            .overlay(RoundedRectangle(cornerRadius: 14).stroke(DetectorStyle.border))
         }
     }
 
-    private var pathCard: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Text("本机路径").font(.system(size: 14, weight: .semibold))
-            HStack(alignment: .top, spacing: 18) {
+    private var pathBody: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .top, spacing: 16) {
                 pathChip(.desktop, session.verdict.desktop)
                 pathChip(.cli, session.verdict.cli)
                 pathChip(.diagnostic, session.verdict.diagnostic)
@@ -244,10 +277,6 @@ struct ProductHomePanel: View {
                 .font(.system(size: 12))
                 .foregroundStyle(DetectorStyle.muted)
         }
-        .padding(18)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(DetectorStyle.surface, in: RoundedRectangle(cornerRadius: 14))
-        .overlay(RoundedRectangle(cornerRadius: 14).stroke(DetectorStyle.border))
     }
 
     private func pathChip(_ target: EnvironmentTarget, _ state: EnvironmentRecommendation) -> some View {
@@ -258,12 +287,13 @@ struct ProductHomePanel: View {
                 .foregroundStyle(DetectorStyle.color(state))
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .background(DetectorStyle.surface, in: RoundedRectangle(cornerRadius: DetectorStyle.radiusChip))
     }
 
-    private var browserCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("外部浏览器对照（可选）").font(.system(size: 14, weight: .semibold))
-            Text("网站数据可在上方直接读取；需要与平时浏览器的结果对照时，再打开原网页。")
+    private var browserBody: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("需要与平时浏览器对照时，再打开原网页。")
                 .font(.system(size: 12))
                 .foregroundStyle(DetectorStyle.muted)
             HStack(spacing: 12) {
@@ -284,16 +314,12 @@ struct ProductHomePanel: View {
                 }
             }
         }
-        .padding(18)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(DetectorStyle.surface, in: RoundedRectangle(cornerRadius: 14))
-        .overlay(RoundedRectangle(cornerRadius: 14).stroke(DetectorStyle.border))
     }
 
     private func verdictColor(_ kind: ProductVerdictKind) -> Color {
         switch kind {
         case .ready: return DetectorStyle.green
-        case .degraded, .attention, .mismatch: return DetectorStyle.amber
+        case .degraded, .attention, .mismatch: return DetectorStyle.pulse
         case .unknown, .idle: return DetectorStyle.muted
         }
     }
@@ -301,7 +327,7 @@ struct ProductHomePanel: View {
     private static func tone(_ tone: ProductHostSample.Tone) -> Color {
         switch tone {
         case .good: return DetectorStyle.green
-        case .warn: return DetectorStyle.amber
+        case .warn: return DetectorStyle.pulse
         case .bad: return DetectorStyle.clay
         case .muted: return DetectorStyle.muted
         }

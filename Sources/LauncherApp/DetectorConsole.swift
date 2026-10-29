@@ -46,29 +46,34 @@ struct DetectorConsole: View {
             sidebar
             Rectangle().fill(DetectorStyle.border).frame(width: 1)
             VStack(alignment: .leading, spacing: 0) {
-                HStack(spacing: 16) {
-                    Text(page.rawValue).font(.system(size: 14, weight: .semibold))
+                HStack(spacing: 14) {
+                    Text(page.rawValue).font(.system(size: 15, weight: .semibold))
                     Spacer()
-                    Text("本机后台检测 · 浏览器可选").font(.system(size: 12)).foregroundStyle(DetectorStyle.muted)
-                    Button { openWindow(id: "settings") } label: { Image(systemName: "slider.horizontal.3") }
-                        .buttonStyle(DetectorActionStyle()).help("设置").accessibilityLabel("设置")
-                    Button {
-                        // In-app only; first screen ingests reports when busy clears. No auto browser.
-                        model.detect()
-                    } label: {
-                        Label(
-                            model.busy ? "检测中…" : (page == .home ? "一键检测" : "重新检测"),
-                            systemImage: page == .home ? "bolt.horizontal.circle" : "arrow.clockwise"
-                        )
+                    Text("本机检测 · 浏览器可选")
+                        .font(.system(size: 12))
+                        .foregroundStyle(DetectorStyle.muted)
+                    Button { openWindow(id: "settings") } label: {
+                        Image(systemName: "slider.horizontal.3")
                     }
-                    .buttonStyle(DetectorActionStyle(primary: true))
-                    .disabled(model.busy)
+                    .buttonStyle(DetectorActionStyle())
+                    .help("设置")
+                    .accessibilityLabel("设置")
+                    // Home keeps the primary CTA; other pages get a quiet re-run.
+                    if page != .home {
+                        Button {
+                            model.detect()
+                        } label: {
+                            Label(model.busy ? "检测中…" : "重新检测", systemImage: "arrow.clockwise")
+                        }
+                        .buttonStyle(DetectorActionStyle(primary: true))
+                        .disabled(model.busy)
+                    }
                 }
-                .padding(.horizontal, 30)
-                .frame(height: 76)
+                .padding(.horizontal, 28)
+                .frame(height: 64)
                 Rectangle().fill(DetectorStyle.border).frame(height: 1)
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 24) {
+                    VStack(alignment: .leading, spacing: 20) {
                         switch page {
                         case .home:
                             ProductHomePanel(
@@ -93,11 +98,11 @@ struct DetectorConsole: View {
                 Rectangle().fill(DetectorStyle.border).frame(height: 1)
                 HStack {
                     Circle()
-                        .fill(model.busy ? DetectorStyle.blue : DetectorStyle.color(overall))
+                        .fill(model.busy ? DetectorStyle.green : DetectorStyle.color(overall))
                         .frame(width: 6, height: 6)
                     Text(model.message).lineLimit(2)
                     Spacer()
-                    Text("环境检测 · 可选防护 · 开源")
+                    Text("环境检测 · 可选防护")
                 }
                 .font(.system(size: 11))
                 .foregroundStyle(DetectorStyle.muted)
@@ -106,7 +111,7 @@ struct DetectorConsole: View {
             }
             .background(DetectorStyle.canvas)
         }
-        .frame(minWidth: 1120, minHeight: 760)
+        .frame(minWidth: 1080, minHeight: 720)
         .foregroundStyle(DetectorStyle.ink)
         .tint(DetectorStyle.green)
         .onChange(of: model.generation) { _ in websiteResults.invalidate() }
@@ -115,66 +120,69 @@ struct DetectorConsole: View {
 
     private var sidebar: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Image(systemName: "network")
-                .font(.system(size: 25, weight: .semibold))
-                .foregroundStyle(DetectorStyle.green)
-                .frame(width: 48, height: 48)
-                .background(DetectorStyle.green.opacity(0.07), in: RoundedRectangle(cornerRadius: 14))
-                .padding(.bottom, 20)
-            Text("Claude\n环境检测")
-                .font(.system(size: 25, weight: .semibold))
-                .tracking(-0.7)
-                .lineSpacing(2)
-            Text("本机路径检测")
-                .font(.system(size: 12))
-                .foregroundStyle(DetectorStyle.muted)
-                .padding(.top, 12)
-                .padding(.bottom, 24)
+            HStack(spacing: 10) {
+                Image(systemName: "waveform.path.ecg")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(DetectorStyle.pulse)
+                    .frame(width: 40, height: 40)
+                    .background(DetectorStyle.greenSoft, in: RoundedRectangle(cornerRadius: 12))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Claude")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(DetectorStyle.muted)
+                    Text("环境检测")
+                        .font(.system(size: 18, weight: .semibold))
+                        .tracking(-0.3)
+                }
+            }
+            .padding(.bottom, 22)
+
             ForEach(DetectorPage.allCases) { item in
                 Button { page = item } label: {
-                    HStack(spacing: 12) {
+                    HStack(spacing: 10) {
                         Image(systemName: item.icon)
-                            .font(.system(size: 17, weight: .medium))
-                            .foregroundStyle(page == item ? DetectorStyle.blue : DetectorStyle.green)
-                            .frame(width: 36, height: 36)
-                            .background(
-                                (page == item ? DetectorStyle.blue : DetectorStyle.green).opacity(0.07),
-                                in: RoundedRectangle(cornerRadius: 10)
-                            )
+                            .font(.system(size: 15, weight: .medium))
+                            .foregroundStyle(page == item ? DetectorStyle.green : DetectorStyle.muted)
+                            .frame(width: 28, height: 28)
                         Text(item.rawValue)
-                            .font(.system(size: 14, weight: page == item ? .semibold : .regular))
+                            .font(.system(size: 13, weight: page == item ? .semibold : .regular))
+                            .foregroundStyle(page == item ? DetectorStyle.ink : DetectorStyle.muted)
                         Spacer(minLength: 0)
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 9)
+                    .background(
+                        page == item ? DetectorStyle.green.opacity(0.12) : .clear,
+                        in: RoundedRectangle(cornerRadius: 10)
+                    )
+                    .overlay(alignment: .leading) {
                         if page == item {
                             RoundedRectangle(cornerRadius: 2)
-                                .fill(DetectorStyle.blue)
-                                .frame(width: 3, height: 16)
+                                .fill(DetectorStyle.green)
+                                .frame(width: 3, height: 18)
+                                .offset(x: -2)
                         }
                     }
-                    .padding(9)
-                    .background(
-                        page == item ? DetectorStyle.blue.opacity(0.08) : .clear,
-                        in: RoundedRectangle(cornerRadius: 11)
-                    )
                 }
                 .buttonStyle(.plain)
-                .padding(.bottom, 7)
+                .padding(.bottom, 4)
             }
-            Spacer(minLength: 24)
-            Rectangle().fill(DetectorStyle.border).frame(height: 1).padding(.bottom, 20)
+            Spacer(minLength: 20)
+            Rectangle().fill(DetectorStyle.border).frame(height: 1).padding(.bottom, 16)
             DetectorStateLabel(state: overall)
             Text(sidebarConclusionLine)
                 .font(.system(size: 12))
                 .foregroundStyle(DetectorStyle.muted)
-                .padding(.top, 9)
+                .padding(.top, 8)
             Text(
-                "环境检测 · v"
+                "v"
                     + (Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "开发版")
             )
-            .font(.system(size: 11))
+            .font(.system(size: 11, design: .monospaced))
             .foregroundStyle(DetectorStyle.muted)
-            .padding(.top, 7)
+            .padding(.top, 6)
             HStack {
-                Label("跟随系统外观", systemImage: "circle.lefthalf.filled").font(.system(size: 10))
+                Label("跟随系统", systemImage: "circle.lefthalf.filled").font(.system(size: 10))
                 Spacer()
                 Button { NSApp.terminate(nil) } label: {
                     Image(systemName: "power")
@@ -184,12 +192,12 @@ struct DetectorConsole: View {
                 .accessibilityLabel("退出检测器")
             }
             .foregroundStyle(DetectorStyle.muted)
-            .padding(.top, 24)
+            .padding(.top, 18)
         }
-        .padding(.horizontal, 20)
-        .padding(.top, 38)
-        .padding(.bottom, 22)
-        .frame(width: 218)
+        .padding(.horizontal, 16)
+        .padding(.top, 28)
+        .padding(.bottom, 18)
+        .frame(width: 200)
         .background(DetectorStyle.sidebar)
     }
 
@@ -267,13 +275,11 @@ struct DetectorSection<Content: View>: View {
     }
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Label(title, systemImage: icon).font(.headline)
+            Label(title, systemImage: icon)
+                .font(.system(size: 14, weight: .semibold))
             content
         }
-        .padding(18)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(DetectorStyle.surface, in: RoundedRectangle(cornerRadius: 14))
-        .overlay(RoundedRectangle(cornerRadius: 14).stroke(DetectorStyle.border))
+        .detectorCard(.regular)
     }
 }
 
@@ -393,13 +399,13 @@ struct DetectorMenu: View {
     }
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Label("Claude 环境检测", systemImage: "network").font(.headline)
+            Label("Claude 环境检测", systemImage: "waveform.path.ecg").font(.headline)
             Text(model.headline)
                 .font(.title2.bold())
                 .foregroundStyle(detectorColor(model.overallRecommendation))
             Text(menuConclusionLine)
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(DetectorStyle.muted)
             Toggle("已开代理", isOn: $proxyAlreadyOn)
             Toggle("后台自动检测", isOn: $preferences.automaticChecks)
             Text(preferences.automaticChecks

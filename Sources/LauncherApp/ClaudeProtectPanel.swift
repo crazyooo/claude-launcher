@@ -2,23 +2,40 @@ import SwiftUI
 import AppKit
 import LauncherCore
 
-/// Optional Claude fail-closed controls, explained in plain product language.
+/// Optional Claude fail-closed controls: two primary actions, quieter docs below.
 struct ClaudeProtectPanel: View {
     @ObservedObject var model: ClaudeProtectModel
     @State private var confirmEnableBlock = false
     @State private var confirmDisableBlock = false
     @State private var confirmKillCheck = false
+    @State private var showGuide = false
+    @State private var showAdvanced = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: DetectorStyle.space * 2.5) {
             header
-            purposeCard
             statusRow
-            recommendCard
-            blockSection
-            watchSection
-            pinSection
-            limitsCard
+            blockControl
+            watchControl
+            DisclosureGroup(isExpanded: $showGuide) {
+                guideBody.padding(.top, 10)
+            } label: {
+                Label("说明与建议", systemImage: "text.alignleft")
+                    .font(.system(size: 13, weight: .semibold))
+            }
+            .padding(14)
+            .background(DetectorStyle.surfaceQuiet, in: RoundedRectangle(cornerRadius: DetectorStyle.radiusCard))
+            .overlay(RoundedRectangle(cornerRadius: DetectorStyle.radiusCard).stroke(DetectorStyle.border))
+
+            DisclosureGroup(isExpanded: $showAdvanced) {
+                advancedBody.padding(.top, 10)
+            } label: {
+                Label("高级 · 钉死代理地址", systemImage: "doc.badge.gearshape")
+                    .font(.system(size: 13, weight: .semibold))
+            }
+            .padding(14)
+            .background(DetectorStyle.surfaceQuiet, in: RoundedRectangle(cornerRadius: DetectorStyle.radiusCard))
+            .overlay(RoundedRectangle(cornerRadius: DetectorStyle.radiusCard).stroke(DetectorStyle.border))
 
             if model.busy {
                 HStack { ProgressView().controlSize(.small); Text(model.operationTitle) }
@@ -55,15 +72,17 @@ struct ClaudeProtectPanel: View {
     }
 
     private var header: some View {
-        HStack(alignment: .top, spacing: 16) {
+        HStack(alignment: .top, spacing: 14) {
             Image(systemName: "shield.lefthalf.filled")
-                .font(.system(size: 26))
-                .foregroundStyle(DetectorStyle.green)
-                .frame(width: 58, height: 58)
-                .background(DetectorStyle.green.opacity(0.08), in: RoundedRectangle(cornerRadius: 16))
-            VStack(alignment: .leading, spacing: 8) {
-                Text("防 Claude 直连").font(.system(size: 28, weight: .semibold)).tracking(-0.4)
-                Text("可选功能：代理挂了时，尽量别让 Claude 悄悄改走直连。先弄清「它干什么」，再动手。")
+                .font(.system(size: 22, weight: .semibold))
+                .foregroundStyle(DetectorStyle.pulse)
+                .frame(width: 48, height: 48)
+                .background(DetectorStyle.pulseSoft, in: RoundedRectangle(cornerRadius: 14))
+            VStack(alignment: .leading, spacing: 6) {
+                Text("防 Claude 直连")
+                    .font(.system(size: 26, weight: .semibold))
+                    .tracking(-0.3)
+                Text("可选保险：代理异常时，尽量别让 Claude 悄悄改走直连。")
                     .font(.system(size: 13))
                     .foregroundStyle(DetectorStyle.muted)
             }
@@ -73,28 +92,9 @@ struct ClaudeProtectPanel: View {
             } label: {
                 Label(model.refreshing ? "刷新中…" : "刷新", systemImage: "arrow.clockwise")
             }
-            .buttonStyle(DetectorActionStyle(primary: true))
+            .buttonStyle(DetectorActionStyle())
             .disabled(model.refreshing)
         }
-    }
-
-    private var purposeCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("它解决什么问题").font(.system(size: 14, weight: .semibold))
-            Text("你平时用自己的代理客户端上 Claude。一旦代理断了，Claude 有时会自己直连官方——账号风险、地区暴露都可能变。本页只给 Claude 加两道可选保险，不接管整机网络。")
-                .font(.system(size: 13))
-                .foregroundStyle(DetectorStyle.ink)
-            VStack(alignment: .leading, spacing: 6) {
-                Label("会动：Claude 相关进程、以及通往 Anthropic 的直连拦截", systemImage: "checkmark.circle")
-                Label("不动：其它 App、你的代理客户端/系统分流、整机断网", systemImage: "xmark.circle")
-            }
-            .font(.system(size: 12))
-            .foregroundStyle(DetectorStyle.muted)
-        }
-        .padding(18)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(DetectorStyle.surface, in: RoundedRectangle(cornerRadius: 14))
-        .overlay(RoundedRectangle(cornerRadius: 14).stroke(DetectorStyle.border))
     }
 
     private var statusRow: some View {
@@ -112,95 +112,92 @@ struct ClaudeProtectPanel: View {
         }
     }
 
-    private var recommendCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("建议怎么用").font(.system(size: 14, weight: .semibold))
-            Text("1. 先保证你自己的代理客户端已开，本地入口正常（上面「本地代理入口」为正常）。")
-            Text("2. 需要时开启「禁止直连」，按 macOS 提示进行管理员授权。")
-            Text("3. 可选：点「代理异常时关掉 Claude」做一次检查；代理挂了就先停 Claude，避免裸奔。")
-            Text("4. 「钉死代理地址」仍是高级手动项，本页不代你改配置文件。")
-        }
-        .font(.system(size: 13))
-        .foregroundStyle(DetectorStyle.ink)
-        .padding(18)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(DetectorStyle.surface, in: RoundedRectangle(cornerRadius: 14))
-        .overlay(RoundedRectangle(cornerRadius: 14).stroke(DetectorStyle.border))
-    }
-
-    private var blockSection: some View {
-        DetectorSection("禁止直连（推荐）", icon: "firewall") {
+    private var blockControl: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("禁止直连")
+                    .font(.system(size: 15, weight: .semibold))
+                Spacer()
+                Text("推荐")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(DetectorStyle.pulse)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(DetectorStyle.pulseSoft, in: Capsule())
+            }
             Text(model.pfSummary)
-                .font(.callout)
-            Text("含义：在 Wi‑Fi / 有线等物理网卡上，拦住通往 Anthropic 网段的直连。走本机回环代理入口（如 127.0.0.1:端口）一般不受影响。")
+                .font(.system(size: 13))
+            Text("在物理网卡上拦住 Anthropic 直连；本机回环代理入口通常不受影响。")
                 .font(.system(size: 12))
                 .foregroundStyle(DetectorStyle.muted)
-            VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 10) {
                 Button("先检查规则") { model.previewL3() }
                     .buttonStyle(DetectorActionStyle())
                     .disabled(model.busy)
-                HStack(alignment: .top, spacing: 10) {
-                    Button("开启禁止直连") { confirmEnableBlock = true }
-                        .buttonStyle(DetectorActionStyle(primary: true))
-                        .disabled(model.busy || model.mutationOutcomeUnknown)
-                    Button("关闭禁止直连") { confirmDisableBlock = true }
-                        .buttonStyle(DetectorActionStyle())
-                        .disabled(model.busy || model.mutationOutcomeUnknown || model.l3Armed != true)
-                }
+                Button("开启") { confirmEnableBlock = true }
+                    .buttonStyle(DetectorActionStyle(primary: true, emphasis: .protect))
+                    .disabled(model.busy || model.mutationOutcomeUnknown)
+                Button("关闭") { confirmDisableBlock = true }
+                    .buttonStyle(DetectorActionStyle())
+                    .disabled(model.busy || model.mutationOutcomeUnknown || model.l3Armed != true)
             }
-            Text("开关防护使用 macOS 管理员授权，当前可能需要输入密码；刷新状态无需密码。")
-                .font(.caption).foregroundStyle(.secondary)
+            Text("开关需 macOS 管理员授权；刷新状态免密。")
+                .font(.caption)
+                .foregroundStyle(DetectorStyle.muted)
             if !model.previewNote.isEmpty {
                 Text(model.previewNote)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(DetectorStyle.muted)
                     .textSelection(.enabled)
             }
         }
+        .detectorCard(.hero)
     }
 
-    private var watchSection: some View {
-        DetectorSection("代理异常时关掉 Claude（可选）", icon: "antenna.radiowaves.left.and.right") {
+    private var watchControl: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("代理异常时关掉 Claude")
+                .font(.system(size: 15, weight: .semibold))
             Text(model.guardSummary)
-                .font(.callout)
-            Text("含义：看本地代理入口还在不在。不在了，就尝试停掉当前 Claude，避免它改走直连。")
+                .font(.system(size: 13))
+            Text("入口不健康时尝试停 Claude Desktop / CLI，避免裸奔；不动其它 App。")
                 .font(.system(size: 12))
                 .foregroundStyle(DetectorStyle.muted)
-            VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 10) {
                 Button("只看一眼（不关进程）") { model.runL4Check(dryRun: true) }
                     .buttonStyle(DetectorActionStyle())
                     .disabled(model.busy)
-                Button("检查并执行（代理异常时关 Claude）") { confirmKillCheck = true }
-                    .buttonStyle(DetectorActionStyle())
+                Button("检查并执行") { confirmKillCheck = true }
+                    .buttonStyle(DetectorActionStyle(primary: true, emphasis: .protect))
                     .disabled(model.busy)
             }
         }
+        .detectorCard(.regular)
     }
 
-    private var pinSection: some View {
-        DetectorSection("钉死代理地址（高级 · 手动）", icon: "doc.badge.gearshape") {
-            Text("把 Claude Desktop / CLI 写死到你的本地代理入口，需要改配置文件，本页不代改。")
-                .font(.callout)
+    private var guideBody: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("1. 先保证自己的代理客户端已开，入口显示正常。")
+            Text("2. 需要时开启「禁止直连」，按系统提示授权。")
+            Text("3. 可选：代理挂了再执行「关掉 Claude」。")
+            Text("会动：Claude 相关进程与 Anthropic 直连拦截。")
+            Text("不动：其它 App、代理客户端、整机断网。")
+            Text("开启 ≠ 已验证防护成功；上网结论仍以环境检测页为准。")
+        }
+        .font(.system(size: 12))
+        .foregroundStyle(DetectorStyle.muted)
+    }
+
+    private var advancedBody: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("把 Claude Desktop / CLI 写死到本地代理入口需改配置，本页不代改。")
+                .font(.system(size: 12))
+                .foregroundStyle(DetectorStyle.muted)
             Button("复制说明文档路径") {
                 copy("docs/claude-protect-l2.md")
             }
             .buttonStyle(.link)
         }
-    }
-
-    private var limitsCard: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("请把期望放对").font(.system(size: 14, weight: .semibold))
-            Text("· 这不是「整机断网」，也不是替你开/关任何代理客户端。")
-            Text("· 开启后也不能保证 100% 防护；界面不会显示「已验证防护成功」。")
-            Text("· 真正上网是否正常，仍以「环境检测」页结论为准。")
-        }
-        .font(.system(size: 12))
-        .foregroundStyle(DetectorStyle.muted)
-        .padding(18)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(DetectorStyle.surface, in: RoundedRectangle(cornerRadius: 14))
-        .overlay(RoundedRectangle(cornerRadius: 14).stroke(DetectorStyle.border))
     }
 
     private func statusChip(title: String, ok: Bool?, text: String) -> some View {
@@ -211,7 +208,7 @@ struct ClaudeProtectPanel: View {
             color = DetectorStyle.green
         } else if ok == false {
             symbol = "xmark.circle"
-            color = DetectorStyle.amber
+            color = DetectorStyle.pulse
         } else {
             symbol = "questionmark.circle"
             color = DetectorStyle.muted
@@ -224,8 +221,8 @@ struct ClaudeProtectPanel: View {
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(DetectorStyle.surface, in: RoundedRectangle(cornerRadius: 12))
-        .overlay(RoundedRectangle(cornerRadius: 12).stroke(DetectorStyle.border))
+        .background(DetectorStyle.surface, in: RoundedRectangle(cornerRadius: DetectorStyle.radiusChip))
+        .overlay(RoundedRectangle(cornerRadius: DetectorStyle.radiusChip).stroke(DetectorStyle.border))
     }
 
     private func copy(_ text: String) {
@@ -233,4 +230,3 @@ struct ClaudeProtectPanel: View {
         NSPasteboard.general.setString(text, forType: .string)
     }
 }
-
