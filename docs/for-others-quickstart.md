@@ -4,6 +4,8 @@
 
 **v0.16.16 / 61：先迁移旧授权。** 旧免密码入口执行用户可写脚本的问题已在新版代码中修正；仅安装 App 不会撤销本机旧授权。下列迁移须使用管理员授权，保留现有 PF 规则和 hook 日志，不重启代理或停止 Claude。GUI 与实际防护效果尚未全部验收。
 
+公开版标识为 `local.crazyooo.*`。若本机还有旧的 `local.crazymax.*` helper / LaunchAgent，请先退役或完成授权迁移后再装，避免两套并行。体验问题欢迎到仓库 [Issues](https://github.com/crazyooo/claude-launcher/issues) 反馈（请脱敏）。
+
 ## 安装（从源码）
 
 需要 macOS 13+，以及 Xcode 16.4（或兼容工具链）。
@@ -61,7 +63,7 @@ sudo /usr/bin/python3 -I -S -B tools/l4/install_sudoers_nopasswd.py verify --use
 
 先核对 `plan` 的各文件摘要，再将其 `source_manifest_sha256` 原样填入上方占位值；不匹配则在更改授权前拒绝。安装器把已核对源码缓存到内存、写入 root 暂存目录，并从暂存副本编译 C 入口。此绑定防止审查后的源码漂移，不替代对安装器本身及工具链的信任。
 
-脚本文件名为兼容旧流程保留，但仅授予精确的 `status` 免密码查询。它先撤销旧授权，再退役旧 wrapper，并把四个特权 Python 文件快照安装到 `/Library/PrivilegedHelperTools/local.crazymax.claude-protect/`。所有代码、依赖、清单及祖先目录须 root 所有、非组/其他用户可写、无符号链接或额外 ACL；运行时再次检查并核对摘要。原生 C 入口在 Python 启动前检查固定 CLT Python framework 及标准库的权限/ACL，拒绝越界符号链接；不走 xcode-select 转发壳。Python 禁用环境与 site 注入，特权端只接受限定参数。安装需要 Apple Command Line Tools，缺失或不可信则拒绝。
+脚本文件名为兼容旧流程保留，但仅授予精确的 `status` 免密码查询。它先撤销旧授权，再退役旧 wrapper，并把四个特权 Python 文件快照安装到 `/Library/PrivilegedHelperTools/local.crazyooo.claude-protect/`。所有代码、依赖、清单及祖先目录须 root 所有、非组/其他用户可写、无符号链接或额外 ACL；运行时再次检查并核对摘要。原生 C 入口在 Python 启动前检查固定 CLT Python framework 及标准库的权限/ACL，拒绝越界符号链接；不走 xcode-select 转发壳。Python 禁用环境与 site 注入，特权端只接受限定参数。安装需要 Apple Command Line Tools，缺失或不可信则拒绝。
 
 若旧 wrapper 的祖先目录不可信，新版只记录警告、跳过读取/改写；该路径的旧 sudoers 授权已先撤销，可继续安装新入口。迁移失败时，已撤销的旧免密授权保持撤销，可排查后重跑；不会自动恢复不安全的旧授权。备份留在系统目录的 `archive-*` 下，不能直接恢复旧 sudoers。`uninstall --i-confirm-uninstall` 只撤销本工具授权并退役入口，保留代码备份和现有 PF 防护；它不等于关闭防直连。旧 `/usr/local/sbin/claude-protect-*` 命令退役，请改用新版 App。
 

@@ -14,7 +14,7 @@ import stat
 import subprocess
 import sys
 
-ROOT = Path('/Library/PrivilegedHelperTools/local.crazymax.claude-protect')
+ROOT = Path('/Library/PrivilegedHelperTools/local.crazyooo.claude-protect')
 ENTRY = ROOT / 'claude-protect'
 FILES = ('claude_protect_privileged.py', 'claude_protect_pf.py',
          'claude_protect_root_hook.py', 'router_pf_root_hook.py')

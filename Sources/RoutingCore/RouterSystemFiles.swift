@@ -7,7 +7,7 @@ enum RouterSystemLayout {
     static let core = root + "/core/mihomo"
     static let state = root + "/state"
     static let socket = root + "/run/control.sock"
-    static let label = "local.crazymax.claude-router.system-host"
+    static let label = "local.crazyooo.claude-router.system-host"
     static let installerRoot = "/Library/Application Support/Claude Router Installer"
     static let applicationSupport = "/Library/Application Support"
     static let launchDaemons = "/Library/LaunchDaemons"

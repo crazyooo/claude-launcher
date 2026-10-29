@@ -5,13 +5,26 @@
 macOS 菜单栏应用：看清本机代理与 Claude 网络；可选在链式代理异常时防 Claude 静默直连 Anthropic。  
 其它 App 继续听系统 / 你自己的代理客户端。本工具**不代启 Claude、不接管整机分流**。
 
-**状态：Public Beta（方案 C 开源壳）。** 源码按 MIT 公开；自动回归已通过的部分见 [验收记录](docs/detect-acceptance.md)。真实防直连差分、部分 GUI、以及签名二进制发布仍未完成——**不要把本仓库当成已验收成品或官方安装包来源**。
+**状态：Public Beta。** 源码按 [MIT](LICENSE) 公开；自动回归已通过的部分见 [验收记录](docs/detect-acceptance.md)。真实防直连差分、部分 GUI、以及签名二进制发布仍未完成——**不要把本仓库当成已验收成品或官方安装包来源**。
+
+## 欢迎体验与反馈
+
+这是 [crazyooo](https://github.com/crazyooo) 的公开实验项目。如果你也在用 Claude Desktop / CLI + 自有代理，欢迎从源码构建试用，并把体验开到 [Issues](https://github.com/crazyooo/claude-launcher/issues)：
+
+- 检测结论是否好懂、有没有误导
+- 菜单栏 / 第一屏哪里卡住或不清
+- 可选「防直连」的安装、授权、开关是否符合预期
+- macOS / Xcode 版本，以及是否安装了特权 helper
+
+反馈请尽量脱敏（不要贴真实出口 IP、账号、代理订阅）。安全类问题请走 [SECURITY.md](SECURITY.md)，不要公开贴可利用细节。
 
 给别人用的最短说明：[docs/for-others-quickstart.md](docs/for-others-quickstart.md)  
 产品边界：[docs/product-detect-guard.md](docs/product-detect-guard.md)  
-安全说明：[SECURITY.md](SECURITY.md) · 贡献：[CONTRIBUTING.md](CONTRIBUTING.md)
+贡献：[CONTRIBUTING.md](CONTRIBUTING.md)
 
-**权限警告：** 可选「防直连」会安装 root 所有的特权入口（`local.crazymax.claude-protect`），并可能改动 PF。安装前请自行审阅源码与安装器摘要。免密码授权仅限精确的 `status`；开关防护走 macOS 管理员授权，当前不承诺 Touch ID。
+**权限警告：** 可选「防直连」会安装 root 所有的特权入口（`local.crazyooo.claude-protect`），并可能改动 PF。安装前请自行审阅源码与安装器摘要。免密码授权仅限精确的 `status`；开关防护走 macOS 管理员授权，当前不承诺 Touch ID。
+
+**标识：** Bundle / LaunchAgent / helper 使用 **`local.crazyooo.*`**（与 GitHub 用户名一致）。若本机仍残留旧的 `local.crazymax.*` 入口，请先按快速开始迁移/退役后再装新版，不要两套并行。
 
 **v0.16.16 / 61：** 特权代码改为系统目录内的 root 所有快照；单独升级 App 不会撤销旧 sudoers，须按快速开始迁移。
 
@@ -30,15 +43,15 @@ macOS 菜单栏应用：看清本机代理与 Claude 网络；可选在链式代
 需要 macOS 13+，以及 Xcode 16.4（或兼容工具链）。
 
 ```sh
-cd /path/to/claude-launcher
+git clone https://github.com/crazyooo/claude-launcher.git
+cd claude-launcher
 /usr/bin/python3 -I -B tools/fetch_router_core.py
 DEVELOPER_DIR=/Applications/Xcode-16.4.app/Contents/Developer bash tools/build.sh
 /usr/bin/python3 -I -B tools/install.py install
 open ~/Applications/Claude\ Launcher.app
 ```
 
-默认装检测版：不写启动包装、不启动连接器。应用在 `~/Applications/Claude Launcher.app`。  
-Bundle / helper 标识使用 **`local.crazymax.*`**。
+默认装检测版：不写启动包装、不启动连接器。应用在 `~/Applications/Claude Launcher.app`。
 
 若本机曾装旧版隔离组件，可先预览再退役（可选）：
 
@@ -63,7 +76,7 @@ L2 模板见 [docs/claude-protect-l2.md](docs/claude-protect-l2.md)。
 完成新版授权安装后，状态查询无需密码：
 
 ```sh
-sudo -n /Library/PrivilegedHelperTools/local.crazymax.claude-protect/claude-protect status
+sudo -n /Library/PrivilegedHelperTools/local.crazyooo.claude-protect/claude-protect status
 ```
 
 ## 检测源（仅两个）

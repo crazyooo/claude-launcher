@@ -69,7 +69,7 @@ enum AccountFields {
 public enum AccountMasterKey {
     public static func load(create: Bool) throws -> SymmetricKey {
         let base: [String: Any] = [kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: "local.crazymax.claude-launcher.account-vault.v1",
+            kSecAttrService as String: "local.crazyooo.claude-launcher.account-vault.v1",
             kSecAttrAccount as String: "master", kSecAttrSynchronizable as String: false]
         var query = base; query[kSecReturnData as String] = true; query[kSecMatchLimit as String] = kSecMatchLimitOne
         var result: CFTypeRef?

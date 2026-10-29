@@ -13,7 +13,7 @@
 #include <unistd.h>
 
 #ifndef PROTECT_ROOT
-#define PROTECT_ROOT "/Library/PrivilegedHelperTools/local.crazymax.claude-protect"
+#define PROTECT_ROOT "/Library/PrivilegedHelperTools/local.crazyooo.claude-protect"
 #endif
 #ifndef PYTHON_FRAMEWORK
 #define PYTHON_FRAMEWORK "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework"

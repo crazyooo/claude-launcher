@@ -16,7 +16,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-LABEL = "com.crazymax.claude-protect-guard"
+LABEL = "com.crazyooo.claude-protect-guard"
 PLIST_NAME = f"{LABEL}.plist"
 DEST_BIN = Path("/usr/local/bin/claude-protect-guard")
 DEST_PLIST = Path(f"/Library/LaunchDaemons/{PLIST_NAME}")

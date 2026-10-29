@@ -18,7 +18,7 @@ import CryptoKit
     private let toolsRoot: String
     private var statusEpoch = 0
     private var queuedRefresh = false
-    private let wrapper = "/Library/PrivilegedHelperTools/local.crazymax.claude-protect/claude-protect"
+    private let wrapper = "/Library/PrivilegedHelperTools/local.crazyooo.claude-protect/claude-protect"
     private var privilegedScript: String { toolsRoot + "/claude_protect_privileged.py" }
     private var pfScript: String { toolsRoot + "/claude_protect_pf.py" }
     private var guardScript: String { toolsRoot + "/claude_protect_guard.py" }

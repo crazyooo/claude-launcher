@@ -1,7 +1,7 @@
 #!/bin/bash
 # Status is passwordless; mutations use ordinary system sudo authorization.
 set -euo pipefail
-ENTRY=/Library/PrivilegedHelperTools/local.crazymax.claude-protect/claude-protect
+ENTRY=/Library/PrivilegedHelperTools/local.crazyooo.claude-protect/claude-protect
 cmd="${1:-}"
 shift || true
 case "$cmd" in

@@ -8,7 +8,7 @@
             <key>PayloadType</key>
             <string>com.anthropic.claude.desktop</string>
             <key>PayloadIdentifier</key>
-            <string>local.crazymax.claude-protect.desktop-egress</string>
+            <string>local.crazyooo.claude-protect.desktop-egress</string>
             <key>PayloadUUID</key>
             <string>7C2E9B1A-4F3D-4A8E-9C11-CLAUDEPROTECT01</string>
             <key>PayloadVersion</key>
@@ -22,7 +22,7 @@
     <key>PayloadDisplayName</key>
     <string>Claude Desktop Proxy (fail-closed via 你的代理客户端 1082)</string>
     <key>PayloadIdentifier</key>
-    <string>local.crazymax.claude-protect.profile</string>
+    <string>local.crazyooo.claude-protect.profile</string>
     <key>PayloadType</key>
     <string>Configuration</string>
     <key>PayloadUUID</key>

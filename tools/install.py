@@ -21,7 +21,7 @@ HOME=Path.home()
 ROOT=HOME/'Library/Application Support/ClaudeLauncher'
 APP=HOME/'Applications/Claude Launcher.app'
 BIN=HOME/'.local/bin'
-AGENT=HOME/'Library/LaunchAgents/local.crazymax.claude-launcher.plist'
+AGENT=HOME/'Library/LaunchAgents/local.crazyooo.claude-launcher.plist'
 SETTINGS=HOME/'.claude/settings.json'
 MANIFEST=ROOT/'installation.json'
 TOOL=APP/'Contents/MacOS/launcher-tool'
@@ -103,7 +103,7 @@ def stop_owned(manifest):
                        check=True, capture_output=True, timeout=30)
     stop_monitor()
     if manifest.get('mode')=='preflight':return
-    query=subprocess.run(['/bin/launchctl','print',f'gui/{os.getuid()}/local.crazymax.claude-launcher'],capture_output=True)
+    query=subprocess.run(['/bin/launchctl','print',f'gui/{os.getuid()}/local.crazyooo.claude-launcher'],capture_output=True)
     if query.returncode==0:
         block=subprocess.run([str(TOOL),'block'],capture_output=True,text=True,timeout=4)
         if block.returncode or json.loads(block.stdout).get('networkAllowed'):
@@ -111,7 +111,7 @@ def stop_owned(manifest):
         subprocess.run(['/bin/launchctl','bootout',f'gui/{os.getuid()}',str(AGENT)],check=True,capture_output=True,timeout=5)
     deadline=time.monotonic()+5
     while time.monotonic()<deadline:
-        query=subprocess.run(['/bin/launchctl','print',f'gui/{os.getuid()}/local.crazymax.claude-launcher'],capture_output=True)
+        query=subprocess.run(['/bin/launchctl','print',f'gui/{os.getuid()}/local.crazyooo.claude-launcher'],capture_output=True)
         processes=subprocess.run(['/bin/ps','-axo','comm='],capture_output=True,text=True,check=True)
         if query.returncode!=0 and str(TOOL) not in processes.stdout.splitlines():return
         time.sleep(.1)

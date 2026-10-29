@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>Label</key>
-	<string>com.crazymax.claude-protect-guard</string>
+	<string>com.crazyooo.claude-protect-guard</string>
 	<key>ProgramArguments</key>
 	<array>
 		<string>/usr/local/bin/claude-protect-guard</string>

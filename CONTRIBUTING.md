@@ -33,8 +33,9 @@ PYTHONPATH=tools:tools/l4 /usr/bin/python3 -B -m unittest \
   install_guard_daemon_tests install_sudoers_nopasswd_tests
 ```
 
-Default product identifiers use the `local.crazymax.*` namespace. Keep that
-stable unless a migration plan for installed helpers is included.
+Default product identifiers use the `local.crazyooo.*` namespace (GitHub user
+`crazyooo`). Keep that stable unless a migration plan for installed helpers is
+included. Pre-public `local.crazymax.*` leftovers should be retired, not mixed.
 
 Legacy `RoutingCore` code remains for compatibility and is not the accepted
 product path. Prefer changes under detector / protect surfaces.

@@ -18,7 +18,7 @@ from pf_guard import PF, Store, GuardError, health, identity
 from pf_policy import dns_evidence, fingerprint
 from pf_service import ROOT, atomic, safe_read, trusted_directory, publish
 
-LABEL = 'local.crazymax.claude-pf-observer'
+LABEL = 'local.crazyooo.claude-pf-observer'
 PLIST = Path('/Library/LaunchDaemons') / (LABEL + '.plist')
 FILES = runtime_identity.FILES
 MANIFEST = ROOT / 'installation.json'

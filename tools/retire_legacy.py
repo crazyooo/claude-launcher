@@ -21,8 +21,14 @@ import tempfile
 import time
 
 SCRIPTS = ('claude-safe', 'claude-vscode-preflight', 'claude-process-wrapper')
-CONNECTOR_LABEL = 'local.crazymax.claude-connector'
-PF_LABEL = 'local.crazymax.claude-pf-observer'
+CONNECTOR_LABEL = 'local.crazyooo.claude-connector'
+PF_LABEL = 'local.crazyooo.claude-pf-observer'
+# Pre-public namespace kept so retirement still finds leftover installs.
+LEGACY_CONNECTOR_LABELS = (CONNECTOR_LABEL, 'local.crazymax.claude-connector')
+LEGACY_LAUNCHER_AGENTS = (
+    'local.crazyooo.claude-launcher.plist',
+    'local.crazymax.claude-launcher.plist',
+)
 PF_FILES = ('pf_service.py', 'pf_guard.py', 'pf_policy.py', 'pf_lab.py',
             'pf_runtime_identity.py', 'pf_recovery_receipt.py', 'pf_control.py')
 LAYOUTS = (set(PF_FILES[:4]), set(PF_FILES[:6]), set(PF_FILES))
@@ -215,8 +221,10 @@ class Retirement:
         absent = lambda path: not path.exists() and not path.is_symlink()
         if no_legacy_metadata and all(absent(self.bin / name) for name in SCRIPTS) and \
                 absent(self.root / 'connector-installation.json') and \
-                absent(self.home / 'Library/LaunchAgents' / (CONNECTOR_LABEL + '.plist')) and \
-                absent(self.home / 'Library/LaunchAgents/local.crazymax.claude-launcher.plist'):
+                all(absent(self.home / 'Library/LaunchAgents' / (label + '.plist'))
+                    for label in LEGACY_CONNECTOR_LABELS) and \
+                all(absent(self.home / 'Library/LaunchAgents' / name)
+                    for name in LEGACY_LAUNCHER_AGENTS):
             report = self.report('user', 'not_needed')
             report['fingerprint'] = fingerprint({'installation': None if manifest_record is None else manifest_record['sha256']})
             return report, {'manifest': manifest, 'manifest_record': manifest_record, 'changes': [], 'wrappers': {}, 'connector': False}
@@ -305,9 +313,11 @@ class Retirement:
                     observed = int(match[1])
                     if observed in ports or not ports and observed != config.get('upstreamPort'):
                         blockers.append('gateway_reference:' + key)
-        legacy_agent = self.home / 'Library/LaunchAgents/local.crazymax.claude-launcher.plist'
-        if legacy_agent.exists() or legacy_agent.is_symlink():
-            blockers.append('legacy_guard_requires_explicit_review')
+        for name in LEGACY_LAUNCHER_AGENTS:
+            legacy_agent = self.home / 'Library/LaunchAgents' / name
+            if legacy_agent.exists() or legacy_agent.is_symlink():
+                blockers.append('legacy_guard_requires_explicit_review')
+                break
         public = self.report('user', 'blocked' if blockers else 'planned', blockers)
         public.update(fingerprint=fingerprint(inventory), scope_description='Known global Claude, VS Code and Code profile files only; project and shell overrides are not rewritten.')
         public['steps'] = [self.step('detach_wrappers', 'blocked' if blockers else 'ready'),

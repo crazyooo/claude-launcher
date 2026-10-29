@@ -16,7 +16,7 @@ import stat
 import subprocess
 
 ROOT = Path('/Library/Application Support/Claude Launcher PF')
-LABEL = 'local.crazymax.claude-pf-observer'
+LABEL = 'local.crazyooo.claude-pf-observer'
 PLIST = Path('/Library/LaunchDaemons') / (LABEL + '.plist')
 LEGACY_FILES = ('pf_service.py', 'pf_guard.py', 'pf_policy.py', 'pf_lab.py')
 RECEIPT_FILES = LEGACY_FILES + ('pf_runtime_identity.py', 'pf_recovery_receipt.py')

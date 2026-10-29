@@ -14,7 +14,7 @@ import tempfile
 import time
 
 ROOT = Path.home() / 'Library/Application Support/ClaudeLauncher'
-LABEL = 'local.crazymax.claude-connector'
+LABEL = 'local.crazyooo.claude-connector'
 PLIST = Path.home() / 'Library/LaunchAgents' / (LABEL + '.plist')
 MANIFEST = ROOT / 'connector-installation.json'
 TOOL = Path.home() / 'Applications/Claude Launcher.app/Contents/MacOS/launcher-tool'

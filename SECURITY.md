@@ -11,7 +11,7 @@ on this project for privileged operations.
 
 Optional direct-connection protection installs code under:
 
-`/Library/PrivilegedHelperTools/local.crazymax.claude-protect/`
+`/Library/PrivilegedHelperTools/local.crazyooo.claude-protect/`
 
 Only the exact `status` command is intended to be passwordless. Enable / disable
 and other mutations require macOS administrator authorization and must execute

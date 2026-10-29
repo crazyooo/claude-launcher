@@ -22,7 +22,7 @@ class DetectorInstallerTests(unittest.TestCase):
         m.TOOL = m.APP/'Contents/MacOS/launcher-tool'
         m.SETTINGS = m.HOME/'.claude/settings.json'
         m.VSCODE_SETTINGS = m.HOME/'Library/Application Support/Code/User/settings.json'
-        m.AGENT = m.HOME/'Library/LaunchAgents/local.crazymax.claude-launcher.plist'
+        m.AGENT = m.HOME/'Library/LaunchAgents/local.crazyooo.claude-launcher.plist'
         m.WRAPPER = m.BIN/'claude-process-wrapper'
         self.source = m.PROJECT/'dist/Claude Launcher.app'
         self.source.mkdir(parents=True); (self.source/'new').write_text('detector')

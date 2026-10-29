@@ -9,7 +9,7 @@ enum RouterSystemHostDiagnostic {
         case hostLease = "host_lease"
         case socketActivation = "socket_activation"
     }
-    private static let logger = Logger(subsystem: "local.crazymax.claude-router.system-host", category: "startup")
+    private static let logger = Logger(subsystem: "local.crazyooo.claude-router.system-host", category: "startup")
 
     enum SocketStep: String, CaseIterable {
         case code, directories, manifest, plist
