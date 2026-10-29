@@ -54,6 +54,16 @@ open ~/Applications/Claude\ Launcher.app
 
 应用装在 `~/Applications/Claude Launcher.app`。首次请在检测设置里填入**自己的**固定出口与代理入口；文档里的 `203.0.113.0/24` 只是示例。
 
+### 试用版 DMG（可选）
+
+```sh
+bash tools/build.sh
+bash tools/package_dmg.sh
+open dist/Claude-Launcher-*.dmg
+```
+
+打开后把 App 拖到 Applications。当前为试用签名：陌生人电脑上若提示无法验证，选中 App → 右键 → 打开。正式对外分发还需 Apple Developer ID 与公证。
+
 若本机曾装旧版隔离组件，可先预览再退役：
 
 ```sh
