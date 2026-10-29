@@ -1,12 +1,19 @@
-# Claude 环境检测 · 检测 + 可选防直连 · v0.16
+# Claude 环境检测 · Public Beta · v0.16
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 macOS 菜单栏应用：看清本机代理与 Claude 网络；可选在链式代理异常时防 Claude 静默直连 Anthropic。  
 其它 App 继续听系统 / 你自己的代理客户端。本工具**不代启 Claude、不接管整机分流**。
 
-给别人用的最短说明：[docs/for-others-quickstart.md](docs/for-others-quickstart.md)  
-产品规则与留/改/冻：[docs/product-detect-guard.md](docs/product-detect-guard.md)
+**状态：Public Beta（方案 C 开源壳）。** 源码按 MIT 公开；自动回归已通过的部分见 [验收记录](docs/detect-acceptance.md)。真实防直连差分、部分 GUI、以及签名二进制发布仍未完成——**不要把本仓库当成已验收成品或官方安装包来源**。
 
-**v0.16.16 / 61 授权修复：** 特权代码改为系统目录内的 root 所有快照，免密码权限只允许精确的状态查询；开关防护改用 macOS 管理员授权，当前不承诺 Touch ID。旧版本必须另行迁移授权，单独升级 App 不会撤销旧 sudoers。GUI 与实际防护差分仍待验收，完整记录见 [验收清单](docs/detect-acceptance.md)。
+给别人用的最短说明：[docs/for-others-quickstart.md](docs/for-others-quickstart.md)  
+产品边界：[docs/product-detect-guard.md](docs/product-detect-guard.md)  
+安全说明：[SECURITY.md](SECURITY.md) · 贡献：[CONTRIBUTING.md](CONTRIBUTING.md)
+
+**权限警告：** 可选「防直连」会安装 root 所有的特权入口（`local.crazymax.claude-protect`），并可能改动 PF。安装前请自行审阅源码与安装器摘要。免密码授权仅限精确的 `status`；开关防护走 macOS 管理员授权，当前不承诺 Touch ID。
+
+**v0.16.16 / 61：** 特权代码改为系统目录内的 root 所有快照；单独升级 App 不会撤销旧 sudoers，须按快速开始迁移。
 
 ## 打开后主路径
 
@@ -16,9 +23,11 @@ macOS 菜单栏应用：看清本机代理与 Claude 网络；可选在链式代
 4. **其他工具**：Claude 相关开源项目目录
 5. **问题与日志**：脱敏诊断记录
 
-侧栏只有上述主路径五项；旧分流 / 当前走线 / 附属工具 UI 已删除。
+侧栏只有上述主路径五项；旧分流 / 当前走线 / 附属工具 UI 已删除。遗留 `RoutingCore` 仅作兼容依赖，不在本版本功能验收内。
 
 ## 安装
+
+需要 macOS 13+，以及 Xcode 16.4（或兼容工具链）。
 
 ```sh
 cd /path/to/claude-launcher
@@ -28,7 +37,8 @@ DEVELOPER_DIR=/Applications/Xcode-16.4.app/Contents/Developer bash tools/build.s
 open ~/Applications/Claude\ Launcher.app
 ```
 
-默认装检测版：不写启动包装、不启动连接器。应用在 `~/Applications/Claude Launcher.app`。
+默认装检测版：不写启动包装、不启动连接器。应用在 `~/Applications/Claude Launcher.app`。  
+Bundle / helper 标识使用 **`local.crazymax.*`**。
 
 若本机曾装旧版隔离组件，可先预览再退役（可选）：
 
@@ -63,6 +73,8 @@ sudo -n /Library/PrivilegedHelperTools/local.crazymax.claude-protect/claude-prot
 
 首页「读取两页结果」通过临时 WebKit 页面读取网站可见结果，标注来源和时间，不覆盖本机 Desktop/CLI 结论。IPSuper 当前 Claude 页只提供环境风控结果，不补造 IP 或连通性。
 
+首次使用请在检测设置中填入**自己的**固定出口与代理入口。文档与测试中的 `203.0.113.0/24` 仅为示例，不能当作网络证据。
+
 ## 开发验证
 
 ```sh
@@ -70,15 +82,19 @@ DEVELOPER_DIR=/Applications/Xcode-16.4.app/Contents/Developer swift test --disab
 PYTHONPATH=tools:tools/l4 /usr/bin/python3 -B -m unittest claude_protect_pf_tests claude_protect_guard_tests router_pf_root_hook_tests detector_installer_tests install_guard_daemon_tests install_sudoers_nopasswd_tests
 ```
 
-默认 Swift 范围跳过真实网站读取。显式设置 `CLAUDE_LAUNCHER_LIVE_WEBSITES=1` 并筛选 `WebsiteResultsLiveTests` 可验证两站读回；网络可用性会影响结果。不要直接运行未筛选的全量测试：冻结的 RoutingCore Live 测试可能实际改动本机网络、PF 或核心进程，须先逐项审阅并安排独立测试环境。
+默认 Swift 范围跳过真实网站读取。显式设置 `CLAUDE_LAUNCHER_LIVE_WEBSITES=1` 并筛选 `WebsiteResultsLiveTests` 可验证两站读回。  
+**不要直接运行未筛选的全量测试：** 冻结的 RoutingCore Live 测试可能实际改动本机网络、PF 或核心进程。
 
-旧路由器代码作为兼容依赖保留，未列入本版本的功能验收。  
-第三方许可：[docs/third-party-notices.md](docs/third-party-notices.md)。
+本快照曾独立复跑：LauncherCoreTests 309 通过 / 1 Live 跳过；Python 六模块 57/57。
 
-## 源码快照边界
+## 许可与第三方
 
-这是 v0.16.16 / 61 的私有开发源码快照。包含构建依赖和测试，排除了本机 Git 历史、交接文件、现场日志、诊断数据和构建二进制。个人路径与出口样例已替换为示例值；`203.0.113.0/24` 为文档地址，首次使用必须在检测设置中填入自己的固定出口及代理入口，不能把示例地址当成网络证据。本机已安装版继续使用原有用户配置。
+- 本项目源码：[MIT](LICENSE)
+- 第三方说明：[docs/third-party-notices.md](docs/third-party-notices.md)
+- **本公开仓库默认不附带 Mihomo 等代理二进制。** 若你自行捆绑 GPL 组件再分发，须自行满足对应许可证义务。
 
-防直连刷新已获用户确认；实际防护差分、开关授权 GUI 等仍待验收。开发源码上传不代表产品整体验收完成，也没有发布可下载的 App 安装包。未为本项目另行选择开源许可证；第三方许可说明保留。
+## 尚未完成（方案 C 剩余）
 
-本脱敏快照已独立复跑：LauncherCoreTests 310 项中 309 通过、1 Live 测试跳过；Python 六模块 57/57 通过。未运行会改系统的 RoutingCore Live 测试。
+- App 内管理员取消 / 开关流程与真实代理故障、直连差分的人工验收
+- 检测体验的产品级收尾（结论可读、减少误导）
+- Developer ID 签名 / 公证的官方二进制 Release（当前无安装包发布）
