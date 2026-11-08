@@ -1,6 +1,6 @@
 # 第三方来源与许可
 
-CCBaga参考源码：<https://github.com/liseami/CCBaga>，提交 `30a171f5191fbb65dc24e4b1a0392d998f7c5719`。本工具独立编写Swift账号管理与控制界面，参考其账号字段边界和浏览器启动约定。
+CCBaga参考源码：<https://github.com/liseami/CCBaga>，提交 `30a171f5191fbb65dc24e4b1a0392d998f7c5719`。本工具独立编写 Swift 账号管理与控制界面，以及 Desktop A–D 整目录切换（`tools/claude_account_switch.py`）；参考其账号字段边界和浏览器启动约定，不复制其实现。
 
 浏览器安装器下载官方发布资产：<https://github.com/liseami/CCBaga/releases/tag/v0.2.48>。仅提取保留原签名的CCBaga-B包，不修改Chromium二进制、不运行上游安装脚本。浏览器包自带的Chromium及其他第三方许可继续随包保留；CCBaga仓库MIT许可不能代替这些组件各自的许可。
 

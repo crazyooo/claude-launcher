@@ -33,9 +33,10 @@ chmod 700 "$APP/Contents/Resources/mihomo"
 cp docs/licenses/mihomo-GPL-3.0.txt "$APP/Contents/Resources/mihomo-GPL-3.0.txt"
 cp tools/console_probe.py tools/providers.py tools/connector_service.py tools/browser_install.py tools/retire_legacy.py tools/install.py \
   tools/claude_protect_privileged.py tools/claude_protect_pf.py tools/claude_protect_guard.py tools/claude_protect_root_hook.py tools/router_pf_root_hook.py \
+  tools/claude_account_switch.py \
   "$APP/Contents/Resources/"
 mkdir -p "$APP/Contents/Resources/tools"
-cp tools/claude_protect_pf.py tools/claude_protect_guard.py "$APP/Contents/Resources/tools/"
+cp tools/claude_protect_pf.py tools/claude_protect_guard.py tools/claude_account_switch.py "$APP/Contents/Resources/tools/"
 cp docs/third-party-notices.md "$APP/Contents/Resources/third-party-notices.md"
 cat > "$APP/Contents/Info.plist" <<'PLIST'
 <?xml version="1.0" encoding="UTF-8"?>
