@@ -24,7 +24,8 @@ macOS 菜单栏应用：检查 Claude Desktop / CLI 是否真走你自己的代�
 | 可选拦 Anthropic 物理口直连 | 自动停你的代理客户端或其它 App |
 | 读取 IPSuper / Net.Coffee 两页可见结果作补充 | 伪造 `protection_verified` / 关闭 TLS 校验 |
 
-完整边界见 [docs/product-detect-guard.md](docs/product-detect-guard.md)。最短上手：[docs/for-others-quickstart.md](docs/for-others-quickstart.md)。
+完整边界见 [docs/product-detect-guard.md](docs/product-detect-guard.md)。最短上手：[docs/for-others-quickstart.md](docs/for-others-quickstart.md)。  
+可选 Desktop 账号切换：[docs/claude-account-switch.md](docs/claude-account-switch.md)。
 
 <p align="center">
   <img src="./assets/readme/flow.svg" width="100%" alt="主路径：已开代理 → 一键检测 → 可选防直连">
@@ -34,8 +35,9 @@ macOS 菜单栏应用：检查 Claude Desktop / CLI 是否真走你自己的代�
 
 1. **已开代理** — 本机记忆你的声明，并核对本地入口；不改系统代理  
 2. **一键检测** — 后台采样，结论回填第一屏（浏览器页可选）  
-3. **防直连（可选）** — 禁止 Anthropic 物理口直连；代理异常时可停 Claude  
-4. **其他工具 / 问题与日志** — 外链目录与脱敏诊断  
+3. **账号（可选）** — Claude Desktop A–D 本地身份切换；默认不代启  
+4. **防直连（可选）** — 禁止 Anthropic 物理口直连；代理异常时可停 Claude  
+5. **其他工具 / 问题与日志** — 外链目录与脱敏诊断  
 
 侧栏只保留上述主路径。遗留 `RoutingCore` 仅为兼容依赖，不在本版本功能验收内。
 
@@ -118,6 +120,7 @@ DEVELOPER_DIR=/Applications/Xcode-16.4.app/Contents/Developer \
 
 PYTHONPATH=tools:tools/l4 /usr/bin/python3 -B -m unittest \
   claude_protect_pf_tests claude_protect_guard_tests \
+  claude_account_switch_tests \
   router_pf_root_hook_tests detector_installer_tests \
   install_guard_daemon_tests install_sudoers_nopasswd_tests
 ```

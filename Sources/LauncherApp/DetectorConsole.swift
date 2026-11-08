@@ -6,6 +6,7 @@ import LauncherCore
 private enum DetectorPage: String, CaseIterable, Identifiable {
     case home = "环境检测"
     case details = "检查详情"
+    case accounts = "账号"
     case protect = "防直连"
     case tools = "其他工具"
     case logs = "问题与日志"
@@ -14,6 +15,7 @@ private enum DetectorPage: String, CaseIterable, Identifiable {
         switch self {
         case .home: return "waveform.path.ecg"
         case .details: return "checklist"
+        case .accounts: return "person.2.crop.square.stack"
         case .protect: return "shield.lefthalf.filled"
         case .tools: return "shippingbox"
         case .logs: return "doc.text.magnifyingglass"
@@ -35,6 +37,7 @@ func copyDetectorText(_ value: String) {
 struct DetectorConsole: View {
     @ObservedObject var model: EnvironmentModel
     @StateObject private var websiteResults = WebsiteResultsSession()
+    @StateObject private var accounts = ClaudeAccountModel()
     @StateObject private var protection = ClaudeProtectModel()
     @State private var page = DetectorPage.home
     @Environment(\.openWindow) private var openWindow
@@ -84,6 +87,8 @@ struct DetectorConsole: View {
                             )
                         case .details:
                             details
+                        case .accounts:
+                            ClaudeAccountPanel(model: accounts)
                         case .protect:
                             ClaudeProtectPanel(model: protection)
                         case .tools:
