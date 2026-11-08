@@ -9,7 +9,7 @@
   <a href="https://github.com/crazyooo/claude-launcher/issues"><img src="https://img.shields.io/badge/feedback-Issues-2F5A47?style=flat" alt="Open Issues"></a>
 </p>
 
-macOS 菜单栏应用：检查 Claude Desktop / CLI 是否真走你自己的代理；可选在链式代理异常时，挡住对 Anthropic 的静默直连。
+macOS 菜单栏应用：检查 Claude Desktop / CLI 是否真走你自己的代理；可选挡住对 Anthropic 的静默直连；还可在本机最多四套 Desktop 登录之间切换。
 
 **不代启 Claude，不接管整机分流。** 其它 App 继续听系统 / 你的代理客户端。
 
@@ -21,14 +21,15 @@ macOS 菜单栏应用：检查 Claude Desktop / CLI 是否真走你自己的代�
 | --- | --- |
 | 核对本地代理入口是否在听 | 代你启动 Claude |
 | 分别检测 Desktop / CLI / 诊断路径 | 整机 TUN / 域名分流路由器 |
+| 可选 Desktop A–D 本地身份切换 | CLI 多账号 / 多开同开 / 加密导出 |
 | 可选拦 Anthropic 物理口直连 | 自动停你的代理客户端或其它 App |
 | 读取 IPSuper / Net.Coffee 两页可见结果作补充 | 伪造 `protection_verified` / 关闭 TLS 校验 |
 
 完整边界见 [docs/product-detect-guard.md](docs/product-detect-guard.md)。最短上手：[docs/for-others-quickstart.md](docs/for-others-quickstart.md)。  
-可选 Desktop 账号切换：[docs/claude-account-switch.md](docs/claude-account-switch.md)。
+Desktop 账号切换细则：[docs/claude-account-switch.md](docs/claude-account-switch.md)。
 
 <p align="center">
-  <img src="./assets/readme/flow.svg" width="100%" alt="主路径：已开代理 → 一键检测 → 可选防直连">
+  <img src="./assets/readme/flow.svg" width="100%" alt="主路径：已开代理 → 一键检测 → 可选账号 / 防直连">
 </p>
 
 ## 30 秒理解主路径
@@ -75,6 +76,19 @@ open dist/Claude-Launcher-*.dmg
 
 曾用过旧标识 `local.crazymax.*` 的机器：先迁移/退役，再装新版，不要两套并行。
 
+## 可选：Desktop 账号切换
+
+侧栏 **账号** 页可在本机最多 **A / B / C / D** 四套 Claude Desktop 登录之间切换：整份换卷 `~/Library/Application Support/Claude`，切换前会先退出 Desktop，默认**不**自动打开（可选手动「切换后打开」）。
+
+典型用法：
+
+1. 把当前已登录的 Desktop 存成账号 A  
+2. 点空位「登录新账号」，打开 Claude 登录另一套  
+3. 之后在卡片之间来回切，不用反复登出登入  
+4. 「刷新额度」可看订阅类型（Free / Pro 均可；Free 通常没有会话/周用量进度条）
+
+账号切换 **不是** 检测通过，也 **不代表** 防直连已开。只动 Desktop，不动 Claude Code CLI。细节与命令行：[docs/claude-account-switch.md](docs/claude-account-switch.md)。
+
 ## 可选：防直连
 
 > **权限警告：** 会安装 root 所有的特权入口（`/Library/PrivilegedHelperTools/local.crazyooo.claude-protect/`），并可能改动 PF。安装前请自行审阅源码与安装器摘要。免密码仅限精确 `status`；开关走 macOS 管理员授权，当前不承诺 Touch ID。单独升级 App **不会**撤销旧 sudoers。
@@ -107,10 +121,11 @@ L3 `apply` / `unload` 与 root hook 须双确认；L4 真杀进程须去掉 `--d
 
 - 检测结论是否好懂、有没有误导  
 - 菜单栏 / 第一屏哪里卡住  
+- Desktop 账号切换、额度刷新是否符合预期  
 - 可选「防直连」的安装、授权、开关是否符合预期  
 - macOS / Xcode 版本，是否装了特权 helper  
 
-请脱敏（不要贴真实出口 IP、账号、代理订阅）。安全问题走 [SECURITY.md](SECURITY.md)。贡献说明：[CONTRIBUTING.md](CONTRIBUTING.md)。
+请脱敏（不要贴真实出口 IP、邮箱、代理订阅、会话令牌）。安全问题走 [SECURITY.md](SECURITY.md)。贡献说明：[CONTRIBUTING.md](CONTRIBUTING.md)。
 
 ## 开发验证
 
